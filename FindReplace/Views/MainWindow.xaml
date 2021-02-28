@@ -1,0 +1,66 @@
+﻿<Window x:Class="FindReplace.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FindReplace"
+        xmlns:viewModels="clr-namespace:FindReplace.ViewModels"
+        d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
+        mc:Ignorable="d"
+        Title="FindReplace" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="30"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock VerticalAlignment="Center"
+                       Margin="20,5, 5, 5"
+                       FontSize="15"
+                       Text="Directory">
+            </TextBlock>
+            <TextBox Grid.Row="0"
+                     Grid.Column="1"
+                     VerticalAlignment="Center"
+                     Margin="10,0"
+                     Width="350"
+                     >
+            </TextBox>
+            <Button Grid.Row="0"
+                        Grid.Column="2"
+                        Width="30"
+                        Margin="0,4"
+                        Content="..."
+                        FontSize="15"
+                        HorizontalAlignment="Left">
+            </Button>
+            <CheckBox Grid.Row="1"
+                      Grid.Column="1"
+                      Content="Include sub-directories"
+                      VerticalAlignment="Center"
+                      FontSize="15"
+                      Margin="10,0">
+            </CheckBox>
+            <DockPanel Grid.Row="1"
+                       Grid.Column="2"
+                       LastChildFill="False">
+                <TextBlock Margin="20,5, 5, 5"
+                           Text="Exclude directory"
+                           FontSize="15"></TextBlock>
+                <TextBox Width="150"
+                         Margin="5,0"
+                         VerticalAlignment="Center"></TextBox>
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Window>
