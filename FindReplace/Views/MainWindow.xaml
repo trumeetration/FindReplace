@@ -13,6 +13,9 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="100"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="100"></ColumnDefinition>
@@ -82,6 +85,36 @@
                      Width="100">
             </TextBox>
         </StackPanel>
-
+        <TextBlock Grid.Column="0"
+                   Grid.Row="2"
+                   VerticalAlignment="Center"
+                   FontSize="15"
+                   Text="Find"
+                   HorizontalAlignment="Center">
+        </TextBlock>
+        <StackPanel Grid.Column="1"
+                    Grid.Row="2"
+                    Orientation="Horizontal">
+            <Button Content="Find"
+                    VerticalAlignment="Center"
+                    Width="80"
+                    FontSize="15"
+                    Margin="5,0">
+            </Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal"
+                    Grid.Column="1"
+                    Grid.Row="4">
+            <ProgressBar Height="25"
+                         VerticalAlignment="Center"
+                         Width="300"
+                         HorizontalAlignment="Left"
+                         Margin="5">
+            </ProgressBar>
+            <TextBlock VerticalAlignment="Center"
+                       Text="Progress: 0/0"
+                       Margin="5"
+                       FontSize="15"></TextBlock>
+        </StackPanel>
     </Grid>
 </Window>
