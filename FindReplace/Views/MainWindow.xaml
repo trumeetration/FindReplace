@@ -33,13 +33,15 @@
                         Margin="5">
                 <TextBox VerticalAlignment="Center"
                          Width="350"
-                         FontSize="15">
+                         FontSize="15"
+                         Text="{Binding FolderPath, Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}">
                 </TextBox>
                 <Button Width="30"
                         VerticalAlignment="Center"
                         Content="..."
                         Margin="10,0"
-                        FontSize="15">
+                        FontSize="15"
+                        Command="{Binding PickFolderCommand, Mode=OneWay}">
                 </Button>
             </StackPanel>
             <StackPanel Orientation="Horizontal"
