@@ -14,53 +14,74 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30"></RowDefinition>
-                <RowDefinition Height="30"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <TextBlock VerticalAlignment="Center"
-                       Margin="20,5, 5, 5"
-                       FontSize="15"
-                       Text="Directory">
-            </TextBlock>
-            <TextBox Grid.Row="0"
-                     Grid.Column="1"
-                     VerticalAlignment="Center"
-                     Margin="10,0"
-                     Width="350"
-                     >
-            </TextBox>
-            <Button Grid.Row="0"
-                        Grid.Column="2"
-                        Width="30"
-                        Margin="0,4"
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <TextBlock VerticalAlignment="Center"
+                   Margin="20,0"
+                   FontSize="15"
+                   Text="Directory">
+        </TextBlock>
+        <StackPanel Orientation="Vertical"
+                    Grid.Column="1"
+                    Grid.Row="0">
+            <StackPanel Orientation="Horizontal"
+                        Margin="5">
+                <TextBox VerticalAlignment="Center"
+                         Width="350"
+                         FontSize="15">
+                </TextBox>
+                <Button Width="30"
+                        VerticalAlignment="Center"
                         Content="..."
-                        FontSize="15"
-                        HorizontalAlignment="Left">
-            </Button>
-            <CheckBox Grid.Row="1"
-                      Grid.Column="1"
-                      Content="Include sub-directories"
-                      VerticalAlignment="Center"
-                      FontSize="15"
-                      Margin="10,0">
-            </CheckBox>
-            <DockPanel Grid.Row="1"
-                       Grid.Column="2"
-                       LastChildFill="False">
-                <TextBlock Margin="20,5, 5, 5"
-                           Text="Exclude directory"
-                           FontSize="15"></TextBlock>
+                        Margin="10,0"
+                        FontSize="15">
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"
+                        Margin="5">
+                <CheckBox Content="Include sub-directories"
+                          VerticalAlignment="Center"
+                          FontSize="15">
+                </CheckBox>
+                <TextBlock Text="Exclude directory"
+                           VerticalAlignment="Center"
+                           FontSize="15"
+                           Margin="30,0,10,0">
+                </TextBlock>
                 <TextBox Width="150"
-                         Margin="5,0"
-                         VerticalAlignment="Center"></TextBox>
-            </DockPanel>
-        </Grid>
+                         VerticalAlignment="Center"
+                         FontSize="15">
+                </TextBox>
+            </StackPanel>
+        </StackPanel>
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   Text="File mask"
+                   VerticalAlignment="Center"
+                   FontSize="15"
+                   Margin="20,0">
+        </TextBlock>
+        <StackPanel Orientation="Horizontal"
+                    Grid.Column="1"
+                    Grid.Row="1">
+            <TextBox FontSize="15"
+                     VerticalAlignment="Center"
+                     Margin="5"
+                     Width="100">
+            </TextBox>
+            <TextBlock FontSize="15"
+                       VerticalAlignment="Center"
+                       Margin="100,0,10,0"
+                       Text="Exclude mask">
+            </TextBlock>
+            <TextBox FontSize="15"
+                     VerticalAlignment="Center"
+                     Margin="0,5"
+                     Width="100">
+            </TextBox>
+        </StackPanel>
+
     </Grid>
 </Window>
