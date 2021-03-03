@@ -35,6 +35,18 @@ namespace FindReplace.ViewModels
             }
         }
 
+        private bool _isChecked = true;
+
+        public bool IsChecked
+        {
+            get => _isChecked;
+            set
+            {
+                _isChecked = value;
+                OnPropertyChanged(nameof(IsChecked));
+            }
+        }
+
         public void OpenFolder()
         {
             CommonOpenFileDialog dialog = new CommonOpenFileDialog();
@@ -49,18 +61,12 @@ namespace FindReplace.ViewModels
 
         public ICommand PickFolderCommand
         {
-            get => new RelayCommand(() =>
-            {
-                CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-                dialog.InitialDirectory = "C:\\Users";
-                dialog.IsFolderPicker = true;
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                {
-                    MessageBox.Show("You selected: " + dialog.FileName);
-                    FolderPath = dialog.FileName;
-                }
-            }, () => true);
+            get => new RelayCommand(OpenFolder, () => true);
         }
 
+        public ICommand IncludeSubDirsCommand
+        {
+            get => new RelayCommand(() => _isChecked = !_isChecked, () => true); 
+        }
     }
 }

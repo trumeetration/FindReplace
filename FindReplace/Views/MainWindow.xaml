@@ -41,14 +41,16 @@
                         Content="..."
                         Margin="10,0"
                         FontSize="15"
-                        Command="{Binding PickFolderCommand, Mode=OneWay}">
+                        Command="{Binding PickFolderCommand}">
                 </Button>
             </StackPanel>
             <StackPanel Orientation="Horizontal"
                         Margin="5">
                 <CheckBox Content="Include sub-directories"
                           VerticalAlignment="Center"
-                          FontSize="15">
+                          FontSize="15"
+                          IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                          >
                 </CheckBox>
                 <TextBlock Text="Exclude directory"
                            VerticalAlignment="Center"
