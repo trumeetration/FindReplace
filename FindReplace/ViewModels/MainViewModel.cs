@@ -64,9 +64,5 @@ namespace FindReplace.ViewModels
             get => new RelayCommand(OpenFolder, () => true);
         }
 
-        public ICommand IncludeSubDirsCommand
-        {
-            get => new RelayCommand(() => _isChecked = !_isChecked, () => true); 
-        }
     }
 }
