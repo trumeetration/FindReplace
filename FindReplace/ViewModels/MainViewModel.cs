@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,7 +36,43 @@ namespace FindReplace.ViewModels
             }
         }
 
-        private bool _isChecked = true;
+        private string _fileMask;
+
+        public string FileMask
+        {
+            get => _fileMask;
+            set
+            {
+                _fileMask = value;
+                OnPropertyChanged(nameof(FileMask));
+            }
+        }
+
+        private string _exDir;
+
+        public string ExcludeDir
+        {
+            get => _exDir;
+            set
+            {
+                _exDir = value;
+                OnPropertyChanged(nameof(ExcludeDir));
+            }
+        }
+
+        private string _exFileMask;
+
+        public string ExcludeFileMask
+        {
+            get => _exFileMask;
+            set
+            {
+                _exFileMask = value;
+                OnPropertyChanged(nameof(ExcludeFileMask));
+            }
+        }
+
+        private bool _isChecked = false;
 
         public bool IsChecked
         {
@@ -50,7 +87,7 @@ namespace FindReplace.ViewModels
         public void OpenFolder()
         {
             CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-            dialog.InitialDirectory = "C:\\Users";
+            dialog.InitialDirectory = "C:\\";
             dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {

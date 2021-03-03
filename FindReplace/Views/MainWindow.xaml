@@ -59,7 +59,8 @@
                 </TextBlock>
                 <TextBox Width="150"
                          VerticalAlignment="Center"
-                         FontSize="15">
+                         FontSize="15"
+                         Text="{Binding ExcludeDir, Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}">
                 </TextBox>
             </StackPanel>
         </StackPanel>
@@ -76,7 +77,8 @@
             <TextBox FontSize="15"
                      VerticalAlignment="Center"
                      Margin="5"
-                     Width="100">
+                     Width="100"
+                     Text="{Binding FileMask, Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}">
             </TextBox>
             <TextBlock FontSize="15"
                        VerticalAlignment="Center"
@@ -86,7 +88,8 @@
             <TextBox FontSize="15"
                      VerticalAlignment="Center"
                      Margin="0,5"
-                     Width="100">
+                     Width="100"
+                     Text="{Binding ExcludeFileMask, Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}">
             </TextBox>
         </StackPanel>
         <TextBlock Grid.Column="0"
