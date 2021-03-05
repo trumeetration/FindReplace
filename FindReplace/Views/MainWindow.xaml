@@ -106,7 +106,8 @@
                     VerticalAlignment="Center"
                     Width="80"
                     FontSize="15"
-                    Margin="5,0">
+                    Margin="5,0"
+                    Command="{Binding FindDataCommand}">
             </Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal"
@@ -116,11 +117,13 @@
                          VerticalAlignment="Center"
                          Width="300"
                          HorizontalAlignment="Left"
-                         Margin="5">
+                         Margin="5"
+                         Value="{Binding ProgressState, UpdateSourceTrigger=PropertyChanged}">
             </ProgressBar>
             <TextBlock VerticalAlignment="Center"
-                       Text="Progress: 0/0"
+                       Text="{Binding ProgressMsg, UpdateSourceTrigger=PropertyChanged}"
                        Margin="5"
+                       MinWidth="150"
                        FontSize="15"></TextBlock>
         </StackPanel>
     </Grid>
