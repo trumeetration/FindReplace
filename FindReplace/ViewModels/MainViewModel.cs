@@ -23,6 +23,7 @@ namespace FindReplace.ViewModels
         }
         public MainViewModel()
         {
+            ProgressMsg = $"Progress: {RenderedItemsCount} / {TotalItems}";
         }
 
         private void BwOnProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -35,6 +36,17 @@ namespace FindReplace.ViewModels
         private void BwOnRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             IsBusy = false;
+            _bw.DoWork -= BwOnDoWork;
+            _bw.RunWorkerCompleted -= BwOnRunWorkerCompleted;
+            if (e.Cancelled)
+            {
+                ProgressState = 0;
+                TotalItems = 0;
+                RenderedItemsCount = 0;
+                ProgressMsg = $"Progress: {RenderedItemsCount} / {TotalItems}";
+            }
+            _bw.ProgressChanged -= BwOnProgressChanged;
+            CommandManager.InvalidateRequerySuggested();
         }
 
         private void BwOnDoWork(object sender, DoWorkEventArgs e)
@@ -175,15 +187,15 @@ namespace FindReplace.ViewModels
             }
         }
 
-        private bool _isChecked = false;
+        private bool _includeSubDirs;
 
-        public bool IsChecked
+        public bool IncludeSubDirs
         {
-            get => _isChecked;
+            get => _includeSubDirs;
             set
             {
-                _isChecked = value;
-                OnPropertyChanged(nameof(IsChecked));
+                _includeSubDirs = value;
+                OnPropertyChanged(nameof(_includeSubDirs));
             }
         }
 
@@ -212,7 +224,15 @@ namespace FindReplace.ViewModels
                 _bw.ProgressChanged += BwOnProgressChanged;
                 IsBusy = true;
                 _bw.RunWorkerAsync(this);
-            }, () => true);
+            }, () => IsBusy == false && string.IsNullOrWhiteSpace(FolderPath) == false);
+        }
+
+        public ICommand CancelWork
+        {
+            get => new RelayCommand(() =>
+            {
+                _bw.CancelAsync();
+            }, () => IsBusy);
         }
 
         private BackgroundWorker _bw = new BackgroundWorker()
