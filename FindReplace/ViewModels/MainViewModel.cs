@@ -5,10 +5,12 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using FindReplace.Commands;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
@@ -63,8 +65,9 @@ namespace FindReplace.ViewModels
             }
             else
             {
-                TotalItems = filesPathes.Length;
-                for (int i = 0; i < filesPathes.Length; i++)
+                var PathCollection = GetFilteredPathList(filesPathes);
+                /*TotalItems = filesPathes.Length;*/
+                for (int i = 0; PathCollection.MoveNext(); i++)
                 {
                     if (_bw.CancellationPending)
                     {
@@ -77,6 +80,19 @@ namespace FindReplace.ViewModels
                 }
             }
 
+        }
+
+        private IEnumerator<string> GetFilteredPathList(string[] filesPathes)
+        {
+            var tmp = filesPathes.Where(x => IsExcluded(x) == false);
+            TotalItems = tmp.Count();
+            return tmp.GetEnumerator();
+        }
+
+        private bool IsExcluded(string path)
+        {
+            return new Regex(ExcludeFileMask.Replace(".", "[.]").Replace("*", ".*").Replace("?", ".")).IsMatch(path)
+                   || path.Contains($"/{ExcludeDir}/");
         }
 
         private string _folderPath;
