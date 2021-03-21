@@ -352,7 +352,7 @@ namespace FindReplace.ViewModels
                 _bw.RunWorkerAsync(this);
             }, () => IsBusy == false 
                      && string.IsNullOrWhiteSpace(FolderPath) == false
-                     && string.IsNullOrWhiteSpace(ToFindSubstring) == false; 
+                     && string.IsNullOrWhiteSpace(ToFindSubstring) == false); 
         }
 
         public ICommand CancelWork
