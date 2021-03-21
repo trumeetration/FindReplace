@@ -13,13 +13,14 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="100"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="100"></ColumnDefinition>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition MaxWidth="610"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <TextBlock VerticalAlignment="Center"
                    Margin="20,0"
@@ -48,6 +49,7 @@
                         Margin="5">
                 <CheckBox Content="Include sub-directories"
                           VerticalAlignment="Center"
+                          HorizontalAlignment="Right"
                           FontSize="15"
                           IsChecked="{Binding IncludeSubDirs,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                           >
@@ -55,7 +57,7 @@
                 <TextBlock Text="Exclude directory"
                            VerticalAlignment="Center"
                            FontSize="15"
-                           Margin="30,0,10,0">
+                           Margin="150,0,10,0">
                 </TextBlock>
                 <TextBox Width="150"
                          VerticalAlignment="Center"
@@ -82,7 +84,7 @@
             </TextBox>
             <TextBlock FontSize="15"
                        VerticalAlignment="Center"
-                       Margin="100,0,10,0"
+                       Margin="290,0,10,0"
                        Text="Exclude mask">
             </TextBlock>
             <TextBox FontSize="15"
@@ -99,20 +101,59 @@
                    Text="Find"
                    HorizontalAlignment="Center">
         </TextBlock>
-        <StackPanel Grid.Column="1"
-                    Grid.Row="2"
+        <TextBox Grid.Row="2"
+                 Grid.Column="1"
+                 Margin="5"
+                 Height="22"
+                 Width="300"
+                 FontSize="15"
+                 HorizontalAlignment="Left"
+                 Text="{Binding ToFindSubstring, Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        <TextBlock Grid.Column="0"
+                   Grid.Row="3"
+                   VerticalAlignment="Center"
+                   FontSize="15"
+                   Text="Replace with"
+                   HorizontalAlignment="Center">
+        </TextBlock>
+        <TextBox Grid.Row="3"
+                 Grid.Column="1"
+                 Margin="5"
+                 Height="22"
+                 Width="300"
+                 FontSize="15"
+                 HorizontalAlignment="Left"
+                 Text="{Binding ReplaceWithSubstring, Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        <StackPanel Grid.Row="4"
+                    Grid.Column="1"
+                    Margin="5,0"
                     Orientation="Horizontal">
             <Button Content="Find"
-                    VerticalAlignment="Center"
                     Width="80"
+                    Margin="0,0,5,0"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
                     FontSize="15"
-                    Margin="5,0"
                     Command="{Binding FindDataCommand}">
             </Button>
+            <Button Content="Replace"
+                    Width="80"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    FontSize="15"
+                    Command="{Binding CorrectDataCommand}">
+            </Button>
         </StackPanel>
+        <TextBlock Grid.Column="0"
+                   Grid.Row="5"
+                   VerticalAlignment="Center"
+                   FontSize="15"
+                   Text="Progress"
+                   HorizontalAlignment="Center">
+        </TextBlock>
         <StackPanel Orientation="Horizontal"
                     Grid.Column="1"
-                    Grid.Row="4">
+                    Grid.Row="5">
             <ProgressBar Height="25"
                          VerticalAlignment="Center"
                          Width="300"
@@ -131,6 +172,44 @@
                     Margin="5,0"
                     Command="{Binding CancelWork}">
             </Button>
+        </StackPanel>
+        <TextBlock Grid.Column="0"
+                   Grid.Row="6"
+                   VerticalAlignment="Center"
+                   FontSize="15"
+                   Text="Results"
+                   HorizontalAlignment="Center">
+        </TextBlock>
+        <StackPanel Orientation="Horizontal"
+                    Grid.Row="6"
+                    Grid.Column="1">
+            <ListBox Height="150"
+                     Width="300"
+                     Margin="5"
+                     BorderBrush="Gray"
+                     BorderThickness="1"
+                     ItemsSource="{Binding Path=FileCollection}" 
+                     SelectedItem="{Binding Path=SelectedFile, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Border BorderThickness="1"
+                    BorderBrush="Gray"
+                    Margin="0,35,0,35">
+                <StackPanel Orientation="Vertical"
+                            VerticalAlignment="Center">
+                    <TextBlock Width="280"
+                               Padding="5,15"
+                               Text="{Binding Path=SelectedFile.StringBefore}"/>
+                    <Separator/>
+                    <TextBlock Width="280" 
+                               Padding="5,15"
+                               Text="{Binding Path=SelectedFile.StringAfter}"/>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </Grid>
 </Window>

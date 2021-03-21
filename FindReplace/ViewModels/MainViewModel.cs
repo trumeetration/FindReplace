@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using FindReplace.Commands;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
@@ -23,14 +25,31 @@ namespace FindReplace.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        private BackgroundWorker _bw;
+        public ObservableCollection<FileData> FileCollection { get; set; }
+
         public MainViewModel()
         {
             ProgressMsg = $"Progress: {RenderedItemsCount} / {TotalItems}";
+            _bw = new BackgroundWorker()
+            {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
+            };
+            _bw.DoWork += BwOnDoWork;
+            _bw.RunWorkerCompleted += BwOnRunWorkerCompleted;
+            _bw.ProgressChanged += BwOnProgressChanged;
+            FileCollection = new ObservableCollection<FileData>();
+            ExcludeDir = ExcludeFileMask = string.Empty;
         }
 
         private void BwOnProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            RenderedItemsCount = (int) e.UserState;
+            if ((FileData)e.UserState != null)
+            {
+                FileCollection.Add((FileData)e.UserState);
+            }
             ProgressState = e.ProgressPercentage;
             ProgressMsg = $"Progress: {RenderedItemsCount} / {TotalItems}";
         }
@@ -38,8 +57,6 @@ namespace FindReplace.ViewModels
         private void BwOnRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             IsBusy = false;
-            _bw.DoWork -= BwOnDoWork;
-            _bw.RunWorkerCompleted -= BwOnRunWorkerCompleted;
             if (e.Cancelled)
             {
                 ProgressState = 0;
@@ -47,14 +64,12 @@ namespace FindReplace.ViewModels
                 RenderedItemsCount = 0;
                 ProgressMsg = $"Progress: {RenderedItemsCount} / {TotalItems}";
             }
-            _bw.ProgressChanged -= BwOnProgressChanged;
             CommandManager.InvalidateRequerySuggested();
         }
 
         private void BwOnDoWork(object sender, DoWorkEventArgs e)
         {
             RenderedItemsCount = 0;
-            var viewmodel = (MainViewModel) e.Argument;
             var bw = (BackgroundWorker) sender;
             string[] filesPathes = Directory.GetFiles(FolderPath,
                 string.IsNullOrWhiteSpace(FileMask) ? "*.*" : FileMask,
@@ -66,37 +81,95 @@ namespace FindReplace.ViewModels
             else
             {
                 var PathCollection = GetFilteredPathList(filesPathes);
-                /*TotalItems = filesPathes.Length;*/
-                for (int i = 0; PathCollection.MoveNext(); i++)
+                TotalItems = PathCollection.Count();
+                for (int i = 0; i < PathCollection.Count(); i++)
                 {
                     if (_bw.CancellationPending)
                     {
                         e.Cancel = true;
                         break;
                     }
+                    RenderFile(PathCollection.ElementAt(i), (int)((i + 1) / (float)PathCollection.Count() * 100), bw);
                     RenderedItemsCount++;
-                    bw.ReportProgress((int)((i + 1) / (float)filesPathes.Length * 100), i + 1);
-                    Thread.Sleep(1);
+                    bw.ReportProgress((int)((i + 1) / (float)PathCollection.Count() * 100));
+                    Thread.Sleep(1000);
                 }
             }
 
         }
 
-        private IEnumerator<string> GetFilteredPathList(string[] filesPathes)
+        private void RenderFile(string path, int percentage,
+            BackgroundWorker bw)
         {
-            var tmp = filesPathes.Where(x => IsExcluded(x) == false);
-            TotalItems = tmp.Count();
-            return tmp.GetEnumerator();
+            if (IsNeedToCorrect == false)
+            {
+                using (var input = File.OpenText(path))
+                {
+                    string line;
+                    while ((line = input.ReadLine()) != null)
+                    {
+                        if (line.Contains(ToFindSubstring))
+                        {
+                            bw.ReportProgress(percentage, new FileData()
+                                {
+                                    Path = path,
+                                    StringBefore = line
+                                });
+                        }
+                    }
+                }
+            }
+            else
+            {
+                bool isSubstrFound = false;
+                using (var input = File.OpenText(path))
+                {
+                    string line;
+                    while ((line = input.ReadLine()) != null)
+                    {
+                        if (line.Contains(ToFindSubstring)) 
+                        {
+                            isSubstrFound = true;
+                            bw.ReportProgress(percentage, new FileData()
+                                {
+                                    Path = path,
+                                    StringBefore = line,
+                                    StringAfter = line.Replace(ToFindSubstring, ReplaceWithSubstring)
+                            });
+                        }
+                    }
+                }
+                if (isSubstrFound == true)
+                {
+                    using (var input = File.OpenText(path))
+                    using (var output = new StreamWriter(path + ".tmp"))
+                    {
+                        string line;
+                        while ((line = input.ReadLine()) != null)
+                        {
+                            line = line.Contains(ToFindSubstring) ? line.Replace(ToFindSubstring, ReplaceWithSubstring) : line; 
+                            output.WriteLine(line);
+                        }
+                    }
+                    File.Replace(path + ".tmp", path, null);
+                }
+            }
+        }
+
+        private IEnumerable<string> GetFilteredPathList(string[] filesPathes)
+        {
+            return filesPathes.Where(x => IsExcluded(x) == false);
         }
 
         private bool IsExcluded(string path)
-        {
-            return new Regex(ExcludeFileMask.Replace(".", "[.]").Replace("*", ".*").Replace("?", ".")).IsMatch(path)
-                   || path.Contains($"/{ExcludeDir}/");
+        { 
+            if (ExcludeFileMask != string.Empty)
+                return new Regex(ExcludeFileMask.Replace(".", "[.]").Replace("*", ".*").Replace("?", ".")).IsMatch(path)
+                        || path.Contains($"/{ExcludeDir}/");
+            return path.Contains($"/{ExcludeDir}/");
         }
 
         private string _folderPath;
-
         public string FolderPath
         {
             get => _folderPath;
@@ -108,7 +181,6 @@ namespace FindReplace.ViewModels
         }
 
         private int _progress;
-
         public int ProgressState
         {
             get => _progress;
@@ -119,10 +191,7 @@ namespace FindReplace.ViewModels
             }
         }
 
-        private int _rendered;
-
         private string _progressMsg;
-
         public string ProgressMsg
         {
             get => _progressMsg;
@@ -133,6 +202,7 @@ namespace FindReplace.ViewModels
             }
         }
 
+        private int _rendered;
         public int RenderedItemsCount
         {
             get => _rendered;
@@ -144,7 +214,6 @@ namespace FindReplace.ViewModels
         }
 
         private int _totalItems;
-
         public int TotalItems
         {
             get => _totalItems;
@@ -156,7 +225,6 @@ namespace FindReplace.ViewModels
         }
 
         private string _fileMask;
-
         public string FileMask
         {
             get => _fileMask;
@@ -168,7 +236,6 @@ namespace FindReplace.ViewModels
         }
 
         private bool _isBusy;
-
         public bool IsBusy
         {
             get => _isBusy;
@@ -179,8 +246,19 @@ namespace FindReplace.ViewModels
             }
         }
 
-        private string _exDir;
+        private bool _isNeedToCorrect;
+        public bool IsNeedToCorrect
+        {
+            get => _isNeedToCorrect;
+            set
+            {
+                _isNeedToCorrect = value;
+                OnPropertyChanged(nameof(IsNeedToCorrect));
+            }
+        }
 
+
+        private string _exDir;
         public string ExcludeDir
         {
             get => _exDir;
@@ -192,7 +270,6 @@ namespace FindReplace.ViewModels
         }
 
         private string _exFileMask;
-
         public string ExcludeFileMask
         {
             get => _exFileMask;
@@ -204,7 +281,6 @@ namespace FindReplace.ViewModels
         }
 
         private bool _includeSubDirs;
-
         public bool IncludeSubDirs
         {
             get => _includeSubDirs;
@@ -212,6 +288,28 @@ namespace FindReplace.ViewModels
             {
                 _includeSubDirs = value;
                 OnPropertyChanged(nameof(_includeSubDirs));
+            }
+        }
+
+        private string _toFind;
+        public string ToFindSubstring
+        {
+            get => _toFind;
+            set
+            {
+                _toFind = value;
+                OnPropertyChanged(nameof(ToFindSubstring));
+            }
+        }
+
+        private string _replaceWith;
+        public string ReplaceWithSubstring
+        {
+            get => _replaceWith;
+            set
+            {
+                _replaceWith = value;
+                OnPropertyChanged(nameof(ReplaceWithSubstring));
             }
         }
 
@@ -235,12 +333,26 @@ namespace FindReplace.ViewModels
         {
             get => new RelayCommand(() =>
             {
-                _bw.DoWork += BwOnDoWork;
-                _bw.RunWorkerCompleted += BwOnRunWorkerCompleted;
-                _bw.ProgressChanged += BwOnProgressChanged;
                 IsBusy = true;
+                IsNeedToCorrect = false;
+                FileCollection.Clear();
                 _bw.RunWorkerAsync(this);
-            }, () => IsBusy == false && string.IsNullOrWhiteSpace(FolderPath) == false);
+            }, () => IsBusy == false
+                     && string.IsNullOrWhiteSpace(FolderPath) == false
+                     && string.IsNullOrWhiteSpace(ToFindSubstring) == false);
+        }
+
+        public ICommand CorrectDataCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                IsBusy = true;
+                IsNeedToCorrect = true;
+                FileCollection.Clear();
+                _bw.RunWorkerAsync(this);
+            }, () => IsBusy == false 
+                     && string.IsNullOrWhiteSpace(FolderPath) == false
+                     && string.IsNullOrWhiteSpace(ToFindSubstring) == false; 
         }
 
         public ICommand CancelWork
@@ -251,10 +363,26 @@ namespace FindReplace.ViewModels
             }, () => IsBusy);
         }
 
-        private BackgroundWorker _bw = new BackgroundWorker()
+        private FileData _selectedFile;
+        public FileData SelectedFile
         {
-            WorkerReportsProgress = true,
-            WorkerSupportsCancellation = true
-        };
+            get => _selectedFile;
+            set
+            {
+                if (_selectedFile != value)
+                {
+                    _selectedFile = value;
+                    OnPropertyChanged(nameof(SelectedFile));
+                }
+            }
+        }
+    }
+
+    public class FileData
+    {
+        public string Path { get; set; }
+        public string StringBefore { get; set; }
+        public string StringAfter { get; set; }
+
     }
 }
