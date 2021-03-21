@@ -7,7 +7,7 @@
         xmlns:viewModels="clr-namespace:FindReplace.ViewModels"
         d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
         mc:Ignorable="d"
-        Title="FindReplace" Height="450" Width="800">
+        Title="FindReplace" Height="450" Width="730">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
